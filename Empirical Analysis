@@ -1,0 +1,53 @@
+import random
+import time
+import sys
+# Increase recursion limit 
+sys.setrecursionlimit(2000)
+# Deterministic Quicksort with middle pivot
+def partition(arr, low, high):
+    mid = (low + high) // 2
+    arr[mid], arr[high] = arr[high], arr[mid]  # use middle element as pivot
+    pivot = arr[high]
+    i = low - 1
+    for j in range(low, high):
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
+    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+    return i + 1
+def quicksort(arr, low, high):
+    if low < high:
+        pi = partition(arr, low, high)
+        quicksort(arr, low, pi - 1)
+        quicksort(arr, pi + 1, high)
+# Randomized Quicksort
+def randomized_partition(arr, low, high):
+    rand_idx = random.randint(low, high)
+    arr[high], arr[rand_idx] = arr[rand_idx], arr[high]
+    return partition(arr, low, high)
+def randomized_quicksort(arr, low, high):
+    if low < high:
+        pi = randomized_partition(arr, low, high)
+        randomized_quicksort(arr, low, pi - 1)
+        randomized_quicksort(arr, pi + 1, high)
+# Timing helper
+def measure_time(sort_func, arr):
+    start = time.perf_counter()
+    sort_func(arr, 0, len(arr) - 1)
+    end = time.perf_counter()
+    return (end - start) * 1000  # milliseconds
+# Datasets
+n = 1000
+datasets = {
+    "Random": random.sample(range(1, 10000), n),
+    "Sorted": list(range(1, n + 1)),
+    "Reverse": list(range(n, 0, -1)),
+}
+# Run experiments
+print(f"{'Input Type':<15} {'Deterministic (ms)':<20} {'Randomized (ms)':<20}")
+for name, data in datasets.items():
+    d1 = data.copy()
+    d2 = data.copy()
+    det_time = measure_time(quicksort, d1)
+    rand_time = measure_time(randomized_quicksort, d2)
+    print(f"{name:<15} {det_time:<20.2f} {rand_time:<20.2f}")
